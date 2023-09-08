@@ -4,14 +4,22 @@ public class Book {
     private  String title;
     private  String author;
     private  String ISBN;
+    private int id;
 
 
 
     //Constructor
-    public Book(String title, String author, String ISBN){
+    public Book(String title, String author, String ISBN, int id){
+        this.id = id;
         this.title = title;
         this.author = author;
         this.ISBN = ISBN;
+    }
+
+    public Book(){
+        this.title = null;
+        this.author = null;
+        this.ISBN = null;
     }
 
     public String getTitle(){
@@ -24,6 +32,16 @@ public class Book {
         return this.ISBN;
     }
 
+    public void setTitle(String title) {
+        this.title = title;
+    }
 
+    public void setAuthor(String author) {
+        this.author = author;
+    }
+
+    public void setISBN(String ISBN) {
+        this.ISBN = ISBN;
+    }
 
 }
