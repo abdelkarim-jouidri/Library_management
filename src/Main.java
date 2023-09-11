@@ -30,11 +30,12 @@ public class Main {
                 System.out.println("Menu:");
                 System.out.println("1. Add a new book to the library\t 4. Manage the stock");
                 System.out.println("2. Show all the available books\t\t 5. Add new members");
-                System.out.println("3. Manage the collection of books\t 6. Exit");
-                System.out.print("Enter your choice: ");
+                System.out.println("3. Manage the collection of books\t 6. Manage borrowing a book");
+                System.out.println("7. Exit");
 
 
                 choice = scanner.nextInt();
+                scanner.nextLine();
 
                 switch (choice) {
                     case 1:
@@ -58,12 +59,12 @@ public class Main {
                         addNewMember();
                         break;
                     case 6:
-                        System.out.println("Exiting the program.");
+                        System.out.println("managing borrowing record.");
                         break;
                     default:
                         System.out.println("Invalid choice. Please try again.");
                 }
-            } while (choice != 4);
+            } while (choice != 7);
 
 
         } catch (Exception e) {
@@ -139,6 +140,7 @@ public class Main {
 
                 if (choice == 1) {
                     System.out.println("Enter the ID of the book: ");
+                    // this still needs input validation
                     int bookID = scanner.nextInt();
                     Book book = bookDAO.get(bookID);
 
@@ -176,7 +178,6 @@ public class Main {
                         System.out.println("Failed to remove copies.");
                     }
                 } else if (choice == 3) {
-                    // Exit the loop and the method
                     break;
                 } else {
                     System.out.println("Invalid choice. Please enter 1, 2, or 3.");
@@ -198,8 +199,8 @@ public class Main {
                 String lastName = scanner.nextLine();
 
                 // input validation
-                boolean isFirstNameValid = !Pattern.matches("^[A-Za-z ]+$", firstName);
-                boolean isLastNameValid = !Pattern.matches("^[A-Za-z ]+$", lastName);
+                boolean isFirstNameValid = Pattern.matches("^[A-Za-z ]+$", firstName);
+                boolean isLastNameValid = Pattern.matches("^[A-Za-z ]+$", lastName);
 
                 if (!isFirstNameValid || !isLastNameValid) {
                     System.out.println("Invalid first or last name. Names should contain only letters and spaces.");

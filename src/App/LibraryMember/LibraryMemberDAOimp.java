@@ -3,10 +3,7 @@ package App.LibraryMember;
 import App.DAO;
 import App.Database.Database;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.sql.*;
 import java.util.ArrayList;
 
 public class LibraryMemberDAOimp implements LibraryMemberDAO{
@@ -40,9 +37,9 @@ public class LibraryMemberDAOimp implements LibraryMemberDAO{
     public LibraryMember insert(LibraryMember instance) throws SQLException {
         Connection con = Database.getConnection();
         String SQL = "INSERT INTO library_members(fname, lname) VALUES (? ,?)";
-        PreparedStatement ps = con.prepareStatement(SQL);
+        PreparedStatement ps = con.prepareStatement(SQL, Statement.RETURN_GENERATED_KEYS);
         ps.setString(1, instance.getFirstName());
-        ps.setString(1, instance.getLastName());
+        ps.setString(2, instance.getLastName());
         int result = ps.executeUpdate();
         if (result == 1){
             ResultSet generatedKeys = ps.getGeneratedKeys();
