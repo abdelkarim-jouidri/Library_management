@@ -4,7 +4,7 @@ public class Book {
     private  String title;
     private  String author;
     private  String ISBN;
-    private int id;
+    private  int id ;
 
 
 
@@ -22,6 +22,10 @@ public class Book {
         this.ISBN = null;
     }
 
+    public int getId() {
+        return id;
+    }
+
     public String getTitle(){
         return this.title;
     }
@@ -31,6 +35,10 @@ public class Book {
     public String getISBN(){
         return this.ISBN;
     }
+
+//    public int getId(){
+//        return this.id;
+//    }
 
     public void setTitle(String title) {
         this.title = title;

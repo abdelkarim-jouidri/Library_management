@@ -32,7 +32,18 @@ public class BookDAOImp implements BookDAO{
 
     @Override
     public ArrayList<Book> getAll() throws SQLException {
-        return null;
+        Connection con = Database.getConnection();
+        ArrayList<Book> books = new ArrayList<>();
+        String SQL = "SELECT * FROM books";
+        PreparedStatement ps = con.prepareStatement(SQL);
+        ResultSet rs = ps.executeQuery();
+        while (rs.next()){
+            int id = rs.getInt("id");
+            Book book = get(id);
+            books.add(book);
+        }
+
+        return books;
     }
 
     @Override
@@ -50,16 +61,31 @@ public class BookDAOImp implements BookDAO{
         ps.setString(3, instance.getISBN());
 
         int result = ps.executeUpdate();
+        ps.close();
+        con.close();
         return result;
     }
 
     @Override
-    public int update(Book instance) throws SQLException {
+    public int update(Book book) throws SQLException {
+        Connection con = Database.getConnection();
+        String SQL = "UPDATE books SET title = ? , author = ? , ISBN = ? WHERE id = ?";
+        PreparedStatement ps = con.prepareStatement(SQL);
+        ps.setString(1, book.getTitle());
+        ps.setString(2, book.getAuthor());
+        ps.setString(3, book.getISBN());
+        ps.setInt(4, book.getId());
         return 0;
     }
 
     @Override
-    public int delete(Book instance) throws SQLException {
-        return 0;
+    public int delete(Book book) throws SQLException {
+        Connection con = Database.getConnection();
+        String SQL = "DELETE FROM books WHERE id = ?";
+        PreparedStatement ps = con.prepareStatement(SQL);
+        ps.setInt(1,book.getId());
+        int result = ps.executeUpdate();
+
+        return result;
     }
 }
