@@ -6,14 +6,17 @@ public class Book {
     private  String ISBN;
     private  int id ;
 
+    private int quantity;
+
 
 
     //Constructor
-    public Book(String title, String author, String ISBN, int id){
+    public Book(String title, String author, String ISBN, int id, int quantity){
         this.id = id;
         this.title = title;
         this.author = author;
         this.ISBN = ISBN;
+        this.quantity = quantity;
     }
 
     public Book(){
@@ -36,9 +39,9 @@ public class Book {
         return this.ISBN;
     }
 
-//    public int getId(){
-//        return this.id;
-//    }
+    public int getQuantity() {
+        return quantity;
+    }
 
     public void setTitle(String title) {
         this.title = title;
@@ -54,5 +57,9 @@ public class Book {
 
     public void setId(int id) {
         this.id = id;
+    }
+
+    public void setQuantity(int quantity) {
+        this.quantity = quantity;
     }
 }

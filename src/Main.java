@@ -4,9 +4,12 @@ import App.Book.BookDAOImp;
 import App.BookCopy.BookCopyDAO;
 import App.BookCopy.BookCopyDAOimp;
 import App.Database.Database;
+import App.LibraryMember.LibraryMember;
+import App.LibraryMember.LibraryMemberDAOimp;
 
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.sql.SQLOutput;
 import java.util.ArrayList;
 import java.util.Scanner;
 import java.util.regex.Pattern;
@@ -14,7 +17,8 @@ import java.util.regex.Pattern;
 public class Main {
 
     private static BookDAO bookDAO = new BookDAOImp();
-    private static BookCopyDAO bookCopyDAO = new BookCopyDAOimp();
+    private static BookCopyDAOimp bookCopyDAO = new BookCopyDAOimp();
+    private static LibraryMemberDAOimp libraryMemberDAO = new LibraryMemberDAOimp();
     private static Scanner scanner = new Scanner(System.in);
 
     public static void main(String[] args) {
@@ -24,11 +28,11 @@ public class Main {
 
             do {
                 System.out.println("Menu:");
-                System.out.println("1. Add a new book to the library");
-                System.out.println("2. Show all the available books");
-                System.out.println("3. ");
-                System.out.println("4. Exit");
+                System.out.println("1. Add a new book to the library\t 4. Manage the stock");
+                System.out.println("2. Show all the available books\t\t 5. Add new members");
+                System.out.println("3. Manage the collection of books\t 6. Exit");
                 System.out.print("Enter your choice: ");
+
 
                 choice = scanner.nextInt();
 
@@ -45,9 +49,15 @@ public class Main {
                         showAllBooks(AllBooks);
                         break;
                     case 3:
-                        System.out.println("In development.");
+                        System.out.println("management of books");
                         break;
                     case 4:
+                        manageTheStock();
+                        break;
+                    case 5:
+                        addNewMember();
+                        break;
+                    case 6:
                         System.out.println("Exiting the program.");
                         break;
                     default:
@@ -65,13 +75,13 @@ public class Main {
         if(books.isEmpty()){
             System.out.println("No Available Books in the library");
         }else {
-            System.out.println("------------------------------------------List of Available books--------------------------------------------");
-            System.out.println("-------------------------------------------------------------------------------------------------------------");
-            System.out.println("| ID         | Title                          | Author                         | ISBN                 |");
-            System.out.println("-------------------------------------------------------------------------------------------------------------");
+            System.out.println("------------------------------------------List of Available books--------------------------------------------------------");
+            System.out.println("-------------------------------------------------------------------------------------------------------------------------");
+            System.out.println("| ID         | Title                          | Author                         | ISBN                 | Quantity        |");
+            System.out.println("-------------------------------------------------------------------------------------------------------------------------");
 
             for (Book book : books) {
-                System.out.printf("| %-10d | %-30s | %-30s | %-20s |\n", book.getId(), book.getTitle(), book.getAuthor(), book.getISBN());
+                System.out.printf("| %-10d | %-30s | %-30s | %-20s | %-15s |\n", book.getId(), book.getTitle(), book.getAuthor(), book.getISBN(), book.getQuantity());
             }
         }
     }
@@ -118,4 +128,105 @@ public class Main {
             return res;
         }
     }
+
+    public static void manageTheStock() {
+        try {
+            while (true) {
+                System.out.println("1. Add new copies to the book collection");
+                System.out.println("2. Remove copies from the book collection");
+                System.out.println("3. Exit");
+                int choice = scanner.nextInt();
+
+                if (choice == 1) {
+                    System.out.println("Enter the ID of the book: ");
+                    int bookID = scanner.nextInt();
+                    Book book = bookDAO.get(bookID);
+
+                    if (book == null) {
+                        System.out.println("No existing book with the ID = " + bookID);
+                        continue; // Continue the loop to display the menu again
+                    }
+
+                    System.out.println("Enter the number of copies: ");
+                    int number = scanner.nextInt();
+
+                    int successfulInsertions = bookCopyDAO.insertMany(book, number);
+                    if (successfulInsertions == number) {
+                        System.out.println("The operation has been successful");
+                    } else {
+                        System.out.println("Failed to add copies.");
+                    }
+                } else if (choice == 2) {
+                    System.out.println("Enter the ID of the book: ");
+                    int bookID = scanner.nextInt();
+                    Book book = bookDAO.get(bookID);
+
+                    if (book == null) {
+                        System.out.println("No existing book with the ID = " + bookID);
+                        continue; // Continue the loop to display the menu again
+                    }
+
+                    System.out.println("Enter the number of copies: ");
+                    int number = scanner.nextInt();
+
+                    int result = bookCopyDAO.deleteMany(number);
+                    if (result == 1) {
+                        System.out.println("The operation has been successful");
+                    } else {
+                        System.out.println("Failed to remove copies.");
+                    }
+                } else if (choice == 3) {
+                    // Exit the loop and the method
+                    break;
+                } else {
+                    System.out.println("Invalid choice. Please enter 1, 2, or 3.");
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            System.out.println("Something went wrong!!");
+        }
+    }
+
+    public static void addNewMember() {
+        try {
+            while (true) {
+                System.out.print("Enter the member's first name: ");
+                String firstName = scanner.nextLine();
+
+                System.out.print("Enter the member's last name: ");
+                String lastName = scanner.nextLine();
+
+                // input validation
+                boolean isFirstNameValid = !Pattern.matches("^[A-Za-z ]+$", firstName);
+                boolean isLastNameValid = !Pattern.matches("^[A-Za-z ]+$", lastName);
+
+                if (!isFirstNameValid || !isLastNameValid) {
+                    System.out.println("Invalid first or last name. Names should contain only letters and spaces.");
+                    continue;
+                }
+
+                LibraryMember member = new LibraryMember();
+                member.setFirstName(firstName);
+                member.setLastName(lastName);
+
+                LibraryMember result = libraryMemberDAO.insert(member);
+
+                if (result != null) {
+                    System.out.println("Member added successfully.");
+                } else {
+                    System.out.println("Failed to add the member.");
+                }
+
+                break;
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            System.out.println("Something went wrong while adding the member.");
+        }
+    }
+
+
+
+
 }

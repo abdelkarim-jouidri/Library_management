@@ -25,4 +25,20 @@ public class BookCopy {
         this.state = BookState.LOST;
         return this;
     }
+
+    public void setBook(Book book) {
+        this.book = book;
+    }
+
+    public void setState(BookState state) {
+        this.state = state;
+    }
+
+    public Book getBook() {
+        return book;
+    }
+
+    public BookState getState() {
+        return state;
+    }
 }

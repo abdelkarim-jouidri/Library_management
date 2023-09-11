@@ -11,7 +11,12 @@ public class BookDAOImp implements BookDAO{
     public Book get(int id) throws SQLException {
         Connection con = Database.getConnection();
         Book book = null;
-        String SQL = "SELECT * FROM books WHERE id = ?";
+        String SQL = "SELECT books.id, books.ISBN, books.author, books.title, COUNT(*) AS copy_count\n" +
+                "FROM books \n" +
+                "INNER JOIN books_copies \n" +
+                "ON books.id = books_copies.book_id\n" +
+                "WHERE books_copies.book_status = 'AVAILABLE' AND books.id = ?\n"  +
+                "GROUP BY books.id;";
         PreparedStatement ps = con.prepareStatement(SQL);
         ps.setInt(1,id);
         ResultSet rs = ps.executeQuery();
@@ -20,8 +25,9 @@ public class BookDAOImp implements BookDAO{
             String ISBN = rs.getString("ISBN");
             String title = rs.getString("title");
             String author = rs.getString("author");
+            int quantity = rs.getInt("copy_count");
 
-            book = new Book(title, author, ISBN, bookID);
+            book = new Book(title, author, ISBN, bookID, quantity);
 
         }
         return book;
@@ -36,6 +42,7 @@ public class BookDAOImp implements BookDAO{
         ResultSet rs = ps.executeQuery();
         while (rs.next()){
             int id = rs.getInt("id");
+            System.out.println("FROM get all method : id = "+ id);
             Book book = get(id);
             books.add(book);
         }
@@ -58,7 +65,6 @@ public class BookDAOImp implements BookDAO{
         ps.setString(3, instance.getISBN());
         int result = ps.executeUpdate();
         if (result == 1){
-            // The insertion was successful
             ResultSet generatedKeys = ps.getGeneratedKeys();
             if (generatedKeys.next()){
                 int generatedID = generatedKeys.getInt(1);
