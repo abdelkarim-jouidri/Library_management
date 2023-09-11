@@ -2,10 +2,7 @@ package App.Book;
 
 import App.Database.Database;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.sql.*;
 import java.util.ArrayList;
 
 public class BookDAOImp implements BookDAO{
@@ -52,18 +49,25 @@ public class BookDAOImp implements BookDAO{
     }
 
     @Override
-    public int insert(Book instance) throws SQLException {
+    public Book insert(Book instance) throws SQLException {
         Connection con = Database.getConnection();
         String SQL = "INSERT INTO books(title, author, ISBN) VALUES (?, ?, ?)";
-        PreparedStatement ps = con.prepareStatement(SQL);
+        PreparedStatement ps = con.prepareStatement(SQL, Statement.RETURN_GENERATED_KEYS);
         ps.setString(1, instance.getTitle());
         ps.setString(2, instance.getAuthor());
         ps.setString(3, instance.getISBN());
-
         int result = ps.executeUpdate();
+        if (result == 1){
+            // The insertion was successful
+            ResultSet generatedKeys = ps.getGeneratedKeys();
+            if (generatedKeys.next()){
+                int generatedID = generatedKeys.getInt(1);
+                instance.setId(generatedID);
+            }
+        }
         ps.close();
         con.close();
-        return result;
+        return instance;
     }
 
     @Override

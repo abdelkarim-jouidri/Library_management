@@ -1,6 +1,8 @@
 import App.Book.Book;
 import App.Book.BookDAO;
 import App.Book.BookDAOImp;
+import App.BookCopy.BookCopyDAO;
+import App.BookCopy.BookCopyDAOimp;
 import App.Database.Database;
 
 import java.sql.Connection;
@@ -12,6 +14,7 @@ import java.util.regex.Pattern;
 public class Main {
 
     private static BookDAO bookDAO = new BookDAOImp();
+    private static BookCopyDAO bookCopyDAO = new BookCopyDAOimp();
     private static Scanner scanner = new Scanner(System.in);
 
     public static void main(String[] args) {
@@ -62,7 +65,8 @@ public class Main {
         if(books.isEmpty()){
             System.out.println("No Available Books in the library");
         }else {
-            System.out.println("------------------------List of Available books--------------------------------------------------------------");
+            System.out.println("------------------------------------------List of Available books--------------------------------------------");
+            System.out.println("-------------------------------------------------------------------------------------------------------------");
             System.out.println("| ID         | Title                          | Author                         | ISBN                 |");
             System.out.println("-------------------------------------------------------------------------------------------------------------");
 
@@ -77,33 +81,37 @@ public class Main {
 
         while (true){
             System.out.print("Enter the title of the book: ");
-            String title = scanner.nextLine();
+            String title = scanner.nextLine().trim();
             if (!Pattern.matches("^[a-zA-Z0-9\\s.,'-]+$", title)){
                 System.out.println("Invalid Input For Title.");
                 continue;
 
             }
             System.out.print("Enter the ISBN of the book : ");
-            String isbn = scanner.nextLine();
+            String isbn = scanner.nextLine().trim();
             if(!Pattern.matches("^\\d{13}$", isbn)){
                 System.out.println("Invalid ISBN. The ISBN of a book should be a 13-digit number");
                 continue;
             }
             System.out.print("Enter the author of the book : ");
-            String author = scanner.nextLine();
+            String author = scanner.nextLine().trim();
             if(!Pattern.matches("^[a-zA-Z\\s-]+$", author)){
                 System.out.println("Invalid Input For The Author.");
                 continue;
             }
 
+            System.out.println("Enter the initial stock number : ");
+            int number = scanner.nextInt();
+
             Book newBook = new Book();
             newBook.setISBN(isbn);
             newBook.setTitle(title);
             newBook.setAuthor(author);
-            int res = 0;
+            int res = 1;
 
             try{
-                res = bookDAO.insert(newBook);
+                newBook = bookDAO.insert(newBook);
+                bookCopyDAO.insertMany(newBook, number);
             }catch (Exception e){
                 e.printStackTrace();
             }

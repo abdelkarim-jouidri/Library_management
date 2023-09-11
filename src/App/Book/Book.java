@@ -52,4 +52,7 @@ public class Book {
         this.ISBN = ISBN;
     }
 
+    public void setId(int id) {
+        this.id = id;
+    }
 }
