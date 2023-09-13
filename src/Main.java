@@ -1,13 +1,17 @@
 import App.Book.Book;
 import App.Book.BookDAO;
 import App.Book.BookDAOImp;
+import App.BookCopy.BookCopy;
 import App.BookCopy.BookCopyDAO;
 import App.BookCopy.BookCopyDAOimp;
+import App.BorrowingRecord.BorrowingRecord;
+import App.BorrowingRecord.BorrowingRecordDAOimp;
 import App.Database.Database;
 import App.LibraryMember.LibraryMember;
 import App.LibraryMember.LibraryMemberDAOimp;
 
 import java.sql.Connection;
+import java.sql.Date;
 import java.sql.SQLException;
 import java.sql.SQLOutput;
 import java.util.ArrayList;
@@ -19,6 +23,7 @@ public class Main {
     private static BookDAO bookDAO = new BookDAOImp();
     private static BookCopyDAOimp bookCopyDAO = new BookCopyDAOimp();
     private static LibraryMemberDAOimp libraryMemberDAO = new LibraryMemberDAOimp();
+    private static BorrowingRecordDAOimp borrowingRecordDAO = new BorrowingRecordDAOimp();
     private static Scanner scanner = new Scanner(System.in);
 
     public static void main(String[] args) {
@@ -59,7 +64,7 @@ public class Main {
                         addNewMember();
                         break;
                     case 6:
-                        System.out.println("managing borrowing record.");
+                        manageBorrowingRecord();
                         break;
                     default:
                         System.out.println("Invalid choice. Please try again.");
@@ -140,7 +145,6 @@ public class Main {
 
                 if (choice == 1) {
                     System.out.println("Enter the ID of the book: ");
-                    // this still needs input validation
                     int bookID = scanner.nextInt();
                     Book book = bookDAO.get(bookID);
 
@@ -165,7 +169,7 @@ public class Main {
 
                     if (book == null) {
                         System.out.println("No existing book with the ID = " + bookID);
-                        continue; // Continue the loop to display the menu again
+                        continue;
                     }
 
                     System.out.println("Enter the number of copies: ");
@@ -226,6 +230,60 @@ public class Main {
             System.out.println("Something went wrong while adding the member.");
         }
     }
+
+    public static void manageBorrowingRecord() {
+        try {
+            while (true) {
+                System.out.println("1. Register a book borrowing record");
+                System.out.println("2. Register a book return");
+                System.out.println("3. Exit");
+                int choice = scanner.nextInt();
+
+                if (choice == 1) {
+                    System.out.println("Enter the ID of the book to be borrowed: ");
+                    int bookID = scanner.nextInt();
+                    Book book = bookDAO.get(bookID);
+
+                    if (book == null) {
+                        System.out.println("No existing book with the ID = " + bookID);
+                        continue; // Continue the loop to display the menu again
+                    }
+                    System.out.println("Enter the ID of the member to register the borrowing for : ");
+                    int memberID = scanner.nextInt();
+                    LibraryMember member = libraryMemberDAO.get(memberID);
+
+                    if (member == null) {
+                        System.out.println("None existing member with the ID = " + memberID);
+                        continue; // Continue the loop to display the menu again
+                    }
+                    BorrowingRecord record = new BorrowingRecord();
+                    BookCopy copy = bookCopyDAO.getAvailableCopy(bookID);
+                    record.setBookCopy(copy);
+                    record.setLibraryMember(member);
+                    record.setBorrowDate();
+
+                    borrowingRecordDAO.insert(record);
+                    copy.markAsBorrowed();
+                    bookCopyDAO.updateStatus(copy);
+
+
+                    System.out.println("Registering a book borrowing...");
+                } else if (choice == 2) {
+                    // Implement logic for registering book return
+                    // You can add prompts and validation here
+                    System.out.println("Registering a book return...");
+                } else if (choice == 3) {
+                    break;
+                } else {
+                    System.out.println("Invalid choice. Please enter 1, 2, or 3.");
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            System.out.println("Something went wrong!!");
+        }
+    }
+
 
 
 

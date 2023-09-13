@@ -3,12 +3,27 @@ package App.BookCopy;
 import App.Book.Book;
 
 public class BookCopy {
+    private int id;
     private Book book;
     public BookState state;
     public enum BookState {
         AVAILABLE,
         BORROWED,
         LOST
+    }
+
+    public BookCopy() {
+
+    }
+
+    public BookCopy(int id, Book book, BookState state) {
+        this.id = id;
+        this.book = book;
+        this.state = state;
+    }
+
+    public void setId(int id) {
+        this.id = id;
     }
 
     public BookCopy markAsAvailable(){
@@ -34,11 +49,15 @@ public class BookCopy {
         this.state = state;
     }
 
+    public int getId() {
+        return id;
+    }
+
     public Book getBook() {
         return book;
     }
 
-    public BookState getState() {
-        return state;
+    public String getState() {
+        return state.toString();
     }
 }

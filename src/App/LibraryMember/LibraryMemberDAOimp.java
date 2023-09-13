@@ -11,8 +11,9 @@ public class LibraryMemberDAOimp implements LibraryMemberDAO{
     public LibraryMember get(int id) throws SQLException {
         LibraryMember libraryMember = null;
         Connection con = Database.getConnection();
-        String SQL = "SELECT * FROM library_members ";
+        String SQL = "SELECT * FROM library_members WHERE id = ?";
         PreparedStatement ps = con.prepareStatement(SQL);
+        ps.setInt(1,id);
         ResultSet rs = ps.executeQuery();
         if(rs.next()){
             int member_ID = rs.getInt("id");

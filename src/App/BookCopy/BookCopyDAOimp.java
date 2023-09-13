@@ -1,10 +1,13 @@
 package App.BookCopy;
 
 import App.Book.Book;
+import App.Book.BookDAO;
+import App.Book.BookDAOImp;
 import App.Database.Database;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 
@@ -63,6 +66,7 @@ public class BookCopyDAOimp implements BookCopyDAO{
 
     @Override
     public int update(BookCopy instance) throws SQLException {
+
         return 0;
     }
 
@@ -80,4 +84,42 @@ public class BookCopyDAOimp implements BookCopyDAO{
 
         return  result;
     }
+
+    public BookCopy getAvailableCopy (int id) throws SQLException{
+        Connection con = Database.getConnection();
+        BookCopy copy = null;
+        String SQL = "SELECT * FROM books_copies \n" +
+                     "WHERE book_id = ? AND book_status = 'AVAILABLE' \n" +
+                     "LIMIT 1;" ;
+        PreparedStatement ps = con.prepareStatement(SQL);
+        ps.setInt(1, id);
+        ResultSet rs = ps.executeQuery();
+        if(rs.next()){
+            int ID = rs.getInt("id");
+            int bookID = rs.getInt("book_id");
+            String status = rs.getString("book_status");
+            Book book = new BookDAOImp().get(bookID);
+            BookCopy.BookState state = BookCopy.BookState.valueOf(status);
+            copy = new BookCopy(ID, book, state);
+        }
+    return copy;
+    }
+
+public int updateStatus(BookCopy copy) throws SQLException{
+    int res = 0;
+    try {
+        Connection connection = Database.getConnection();
+        String SQL = "UPDATE books_copies " +
+                     "SET book_status = ? " +
+                     "WHERE id = ?";
+        PreparedStatement ps = connection.prepareStatement(SQL);
+        ps.setString(1, copy.getState().toString());
+        ps.setInt(2, copy.getId());
+        res = ps.executeUpdate();
+    }catch (Exception e){
+        e.printStackTrace();
+    }
+    return res;
+    
+}
 }
