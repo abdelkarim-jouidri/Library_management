@@ -4,6 +4,7 @@ import App.Book.Book;
 import App.Book.BookDAO;
 import App.Book.BookDAOImp;
 import App.Database.Database;
+import App.LibraryMember.LibraryMember;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -12,9 +13,23 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 
 public class BookCopyDAOimp implements BookCopyDAO{
+    private BookDAOImp bookDAO = new BookDAOImp();
     @Override
     public BookCopy get(int id) throws SQLException {
-        return null;
+        BookCopy copy = null;
+        Connection con = Database.getConnection();
+        String SQL = "SELECT * FROM books_copies WHERE id = ?";
+        PreparedStatement ps = con.prepareStatement(SQL);
+        ps.setInt(1,id);
+        ResultSet rs = ps.executeQuery();
+        if(rs.next()){
+            int copy_ID = rs.getInt("id");
+            int book_id = rs.getInt("book_id");
+            Book book = bookDAO.fetch(book_id);
+            String status = rs.getString("book_status");
+            copy = new BookCopy(copy_ID, book, BookCopy.BookState.valueOf(status));
+        }
+        return copy;
     }
 
     @Override

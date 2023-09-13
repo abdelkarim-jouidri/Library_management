@@ -25,6 +25,10 @@ public class BorrowingRecord {
         this.returnDate = returnDate;
     }
 
+    public int getId() {
+        return id;
+    }
+
     public BookCopy getBookCopy() {
         return bookCopy;
     }

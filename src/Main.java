@@ -20,7 +20,7 @@ import java.util.regex.Pattern;
 
 public class Main {
 
-    private static BookDAO bookDAO = new BookDAOImp();
+    private static BookDAOImp bookDAO = new BookDAOImp();
     private static BookCopyDAOimp bookCopyDAO = new BookCopyDAOimp();
     private static LibraryMemberDAOimp libraryMemberDAO = new LibraryMemberDAOimp();
     private static BorrowingRecordDAOimp borrowingRecordDAO = new BorrowingRecordDAOimp();
@@ -165,8 +165,7 @@ public class Main {
                 } else if (choice == 2) {
                     System.out.println("Enter the ID of the book: ");
                     int bookID = scanner.nextInt();
-                    Book book = bookDAO.get(bookID);
-
+                    Book book = bookDAO.getBorrowedBook(bookID);
                     if (book == null) {
                         System.out.println("No existing book with the ID = " + bookID);
                         continue;
@@ -245,8 +244,8 @@ public class Main {
                     Book book = bookDAO.get(bookID);
 
                     if (book == null) {
-                        System.out.println("No existing book with the ID = " + bookID);
-                        continue; // Continue the loop to display the menu again
+                        System.out.println("No Available copies for the book with the ID = " + bookID);
+                        continue;
                     }
                     System.out.println("Enter the ID of the member to register the borrowing for : ");
                     int memberID = scanner.nextInt();
@@ -254,7 +253,7 @@ public class Main {
 
                     if (member == null) {
                         System.out.println("None existing member with the ID = " + memberID);
-                        continue; // Continue the loop to display the menu again
+                        continue;
                     }
                     BorrowingRecord record = new BorrowingRecord();
                     BookCopy copy = bookCopyDAO.getAvailableCopy(bookID);
@@ -269,9 +268,40 @@ public class Main {
 
                     System.out.println("Registering a book borrowing...");
                 } else if (choice == 2) {
-                    // Implement logic for registering book return
-                    // You can add prompts and validation here
-                    System.out.println("Registering a book return...");
+                    System.out.println("Enter the ID of the book to be borrowed: ");
+                    int bookID = scanner.nextInt();
+                    Book book = bookDAO.getBorrowedBook(bookID);
+
+                    if (book == null) {
+                        System.out.println("No Available copies for the book with the ID = " + bookID);
+                        continue;
+                    }
+                    System.out.println("Enter the ID of the member to register the return of the book for : ");
+                    int memberID = scanner.nextInt();
+                    LibraryMember member = libraryMemberDAO.get(memberID);
+
+                    if (member == null) {
+                        System.out.println("None existing member with the ID = " + memberID);
+                        continue;
+                    }
+
+                    BorrowingRecord record = borrowingRecordDAO.get(bookID, memberID);
+
+                    if(record == null){
+                        System.out.println("There is no record for this book and this member");
+                        continue;
+                    }
+
+                    int status = borrowingRecordDAO.update(record);
+
+                    if (status == 1) {
+
+                        System.out.println("The return of the book has been successfully registered");
+                    }
+                    else {
+                        System.out.println("Something went wrong");
+                    }
+
                 } else if (choice == 3) {
                     break;
                 } else {

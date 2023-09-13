@@ -7,6 +7,29 @@ import java.util.ArrayList;
 
 public class BookDAOImp implements BookDAO{
 
+    public Book fetch(int id) throws SQLException{
+        Connection con = Database.getConnection();
+        Book book = null;
+        String SQL = "SELECT * FROM books WHERE id = ?;";
+        PreparedStatement ps = con.prepareStatement(SQL);
+        ps.setInt(1,id);
+        ResultSet rs = ps.executeQuery();
+        if (rs.next()){
+            int bookID = rs.getInt("id");
+            String ISBN = rs.getString("ISBN");
+            String title = rs.getString("title");
+            String author = rs.getString("author");
+
+            book = new Book();
+            book.setId(bookID);
+            book.setTitle(title);
+            book.setISBN(ISBN);
+            book.setAuthor(author);
+
+        }
+        return book;
+    }
+
     @Override
     public Book get(int id) throws SQLException {
         Connection con = Database.getConnection();
@@ -33,6 +56,31 @@ public class BookDAOImp implements BookDAO{
         return book;
     }
 
+    public Book getBorrowedBook(int id) throws SQLException {
+        Connection con = Database.getConnection();
+        Book book = null;
+        String SQL = "SELECT books.id, books.ISBN, books.author, books.title, COUNT(*) AS copy_count\n" +
+                "FROM books \n" +
+                "INNER JOIN books_copies \n" +
+                "ON books.id = books_copies.book_id\n" +
+                "WHERE books_copies.book_status = 'Borrowed' AND books.id = ?\n"  +
+                "GROUP BY books.id;";
+        PreparedStatement ps = con.prepareStatement(SQL);
+        ps.setInt(1,id);
+        ResultSet rs = ps.executeQuery();
+        if (rs.next()){
+            int bookID = rs.getInt("id");
+            String ISBN = rs.getString("ISBN");
+            String title = rs.getString("title");
+            String author = rs.getString("author");
+            int quantity = rs.getInt("copy_count");
+
+            book = new Book(title, author, ISBN, bookID, quantity);
+
+        }
+        return book;
+    }
+
     @Override
     public ArrayList<Book> getAll() throws SQLException {
         Connection con = Database.getConnection();
@@ -42,7 +90,6 @@ public class BookDAOImp implements BookDAO{
         ResultSet rs = ps.executeQuery();
         while (rs.next()){
             int id = rs.getInt("id");
-            System.out.println("FROM get all method : id = "+ id);
             Book book = get(id);
             books.add(book);
         }
