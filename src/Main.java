@@ -1,19 +1,12 @@
 import App.Book.Book;
-import App.Book.BookDAO;
 import App.Book.BookDAOImp;
 import App.BookCopy.BookCopy;
-import App.BookCopy.BookCopyDAO;
 import App.BookCopy.BookCopyDAOimp;
 import App.BorrowingRecord.BorrowingRecord;
 import App.BorrowingRecord.BorrowingRecordDAOimp;
-import App.Database.Database;
 import App.LibraryMember.LibraryMember;
 import App.LibraryMember.LibraryMemberDAOimp;
 
-import java.sql.Connection;
-import java.sql.Date;
-import java.sql.SQLException;
-import java.sql.SQLOutput;
 import java.util.ArrayList;
 import java.util.Scanner;
 import java.util.regex.Pattern;
@@ -36,7 +29,8 @@ public class Main {
                 System.out.println("1. Add a new book to the library\t 4. Manage the stock");
                 System.out.println("2. Show all the available books\t\t 5. Add new members");
                 System.out.println("3. Manage the collection of books\t 6. Manage borrowing a book");
-                System.out.println("7. Exit");
+                System.out.println("7. Search for a book\t");
+                System.out.println("8. Exit");
 
 
                 choice = scanner.nextInt();
@@ -66,10 +60,13 @@ public class Main {
                     case 6:
                         manageBorrowingRecord();
                         break;
+                    case 7:
+                        searchForBooks();
+                        break;
                     default:
                         System.out.println("Invalid choice. Please try again.");
                 }
-            } while (choice != 7);
+            } while (choice != 8);
 
 
         } catch (Exception e) {
@@ -315,6 +312,77 @@ public class Main {
     }
 
 
+    public static void searchForBooks(){
+        int choice;
+        try {
+            while (true) {
+
+                System.out.println("1. Search by Title");
+                System.out.println("2. Search by Author");
+                System.out.println("3. Exit");
+                System.out.print("Enter your choice: ");
+
+                choice = scanner.nextInt();
+                scanner.nextLine(); // Consume the newline character
+
+                if (choice == 1) {
+                    System.out.print("Enter the title: ");
+                    String title = scanner.nextLine().trim();
+
+                    if (Pattern.matches("^[a-zA-Z0-9\\s.,'-]+$", title)) {
+                        ArrayList<Book> searchResults = bookDAO.searchBooksByTitle(title);
+                        System.out.println("inside the if clause");
+                        System.out.println("Search Results:");
+                        System.out.println("--------------------------------------------------------------");
+                        System.out.println("| ID  | Title                        | Author                     | Quantity |");
+                        System.out.println("--------------------------------------------------------------");
+
+                        for (Book book : searchResults) {
+                            System.out.printf("| %-3d | %-28s | %-26s | %-8d |\n", book.getId(), book.getTitle(), book.getAuthor(), book.getQuantity());
+                        }
+
+                        System.out.println("--------------------------------------------------------------");
+
+                        continue; // Return to the menu
+                    }
+
+                    // Implement the search by title logic here
+                    System.out.println("Searching by Title: " + title);
+                } else if (choice == 2) {
+                    System.out.print("Enter the author: ");
+                    String author = scanner.nextLine().trim();
+
+                    if (Pattern.matches("^[a-zA-Z\\s-]+$", author)) {
+                        ArrayList<Book> searchResults = bookDAO.searchBooksByAuthor(author);
+                        System.out.println("inside the if clause");
+                        System.out.println("Search Results:");
+                        System.out.println("--------------------------------------------------------------");
+                        System.out.println("| ID  | Title                        | Author                     | Quantity |");
+                        System.out.println("--------------------------------------------------------------");
+
+                        for (Book book : searchResults) {
+                            System.out.printf("| %-3d | %-28s | %-26s | %-8d |\n", book.getId(), book.getTitle(), book.getAuthor(), book.getQuantity());
+                        }
+
+                        System.out.println("--------------------------------------------------------------");
+                        continue; // Return to the menu
+                    }
+
+                    // Implement the search by author logic here
+                    System.out.println("Searching by Author: " + author);
+                } else if (choice == 3) {
+                    System.out.println("Exiting the menu.");
+                    scanner.close();
+                    return; // Exit the program
+                } else {
+                    System.out.println("Invalid choice. Please try again.");
+                }
+            }
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+
+    }
 
 
 

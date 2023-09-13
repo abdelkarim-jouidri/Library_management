@@ -145,4 +145,45 @@ public class BookDAOImp implements BookDAO{
 
         return result;
     }
+
+    public ArrayList<Book> searchBooksByAuthorOrTitle(String author, String title) throws SQLException{
+        ArrayList<Book> books = new ArrayList<>();
+        Connection connection = Database.getConnection();
+        String SQL = "SELECT b.id, b.title, b.ISBN, b.author, COUNT(*) AS quantity FROM books b\n" +
+                "INNER JOIN books_copies copy ON copy.book_id = b.id\n" +
+                "WHERE title LIKE ? OR author LIKE ?\n" +
+                "GROUP BY b.id;\n";
+
+        try (PreparedStatement preparedStatement = connection.prepareStatement(SQL)) {
+            preparedStatement.setString(1, "%" + title + "%"); // Search for authors containing the provided text
+            preparedStatement.setString(2, "%" + author + "%");   // Search for titles containing the provided text
+            ResultSet resultSet = preparedStatement.executeQuery();
+            System.out.println(preparedStatement.toString());
+            while (resultSet.next()) {
+                int id = resultSet.getInt("id");
+                String ISBN = resultSet.getString("ISBN");
+                String bookAuthor = resultSet.getString("author");
+                String bookTitle = resultSet.getString("title");
+                int quantity = resultSet.getInt("quantity");
+
+                Book book = new Book(bookTitle, bookAuthor, ISBN, id, quantity);
+                books.add(book);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return books;
+    }
+
+    public ArrayList<Book> searchBooksByAuthor(String author) throws SQLException{
+
+        return searchBooksByAuthorOrTitle(author, " ");
+    }
+
+    public ArrayList<Book> searchBooksByTitle(String title) throws SQLException{
+
+        return searchBooksByAuthorOrTitle(" ", title);
+    }
+
 }
